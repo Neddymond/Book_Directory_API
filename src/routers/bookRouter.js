@@ -1,7 +1,6 @@
 const Book = require("../models/Books");
 const express = require("express");
 const router = new express.Router();
-const hal = require("hal");
 
 /** Endpoint for adding books */
 router.post("/books/add", async (req, res) => {
@@ -10,14 +9,6 @@ router.post("/books/add", async (req, res) => {
 
     // Enter book in the db
     await book.save();
-
-    // Resource
-    let Books = new hal.Resource({ book }, "/books/add");
-
-    // Links
-    Books.link("all books","/books/all");
-    Books.link("books by name and author", "/books/:name/:author");
-    Books.link("delete books", "/books/del");
 
     res.status(201).send({ Books });
   } catch (e) {
@@ -59,13 +50,6 @@ router.get("/books/all", async (req, res) => {
       res.status(404).send("Directory currently empty");
     }
 
-    let Books = new hal.Resource({ books }, "/books/all");
-
-    // Links
-    Books.link("add books","/books/add");
-    Books.link("books by name and author", "/books/:name/:author");
-    Books.link("delete books", "/books/del");
-
     res.send(Books);
   } catch (e) {
     res.status(500).end(e);
@@ -88,13 +72,6 @@ router.get("/books/:name/:author", async (req, res) => {
       res.status(404).send("Book not found");
     }
 
-    let Books = new hal.Resource({ book } , "/books/:name/:author");
-
-    // Links
-    Books.link("add books","/books/add");
-    Books.link("all books","/books/all");
-    Books.link("delete books", "/books/del");
-
     res.send(Books);
   } catch (e) {
     res.status(500).end(e);
@@ -106,11 +83,6 @@ router.delete("/books/del", async (req, res) => {
   try {
     // delete all books
     const deletedBooks = await Book.find({}).deleteMany();
-
-    let Books = new hal.Resource({ deletedBooks }, "/books/del");
-
-    // Links
-    Books.link("add books","/books/add");
 
     res.send(Books);
   } catch (e) {
