@@ -1,9 +1,11 @@
 const Book = require("../models/Books");
+const Rating = require("../models/Rating");
 const express = require("express");
 const router = new express.Router();
+const auth = require("../Middleware/auth");
 
 /** Endpoint for adding books */
-router.post("/books/add", async (req, res) => {
+router.post("/books/add", auth, async (req, res) => {
   try {
     const book = new Book({ ...req.body });
 
@@ -50,36 +52,25 @@ router.get("/books/all", async (req, res) => {
       res.status(404).send("Directory currently empty");
     }
 
-    res.send(Books);
-  } catch (e) {
-    res.status(500).end(e);
-  }
-});
+    // get all the ratings for this book
+    const ratings = await Rating.find({ _id: books.ratings });
 
-/** Endpoint for getting books by parameter */
-router.get("/books/:name/:author", async (req, res) => {
-  try {
-    let name = req.params.name;
-    let authors = req.params.author;
-
-    // query Book collection using book name and book authors
-    const book = await Book.find({
-      name,
-      authors
-    });
-
-    if (book.length <= 0) {
-      res.status(404).send("Book not found");
+    const sum_of_all_ratings;
+    for (let i = 0; i <= ratings.length; i++) {
+      sum_of_all_ratings += ratings[i].value;
     }
 
-    res.send(Books);
+    // calculate the average rating by dividing the sum of all ratings by the number of ratings
+    const averageRating = sum_of_all_ratings / ratings.length;
+
+    res.send({ Books, averageRating });
   } catch (e) {
     res.status(500).end(e);
   }
 });
 
 /** Endpoint for deleting books */
-router.delete("/books/del", async (req, res) => {
+router.delete("/books/del", auth, async (req, res) => {
   try {
     // delete all books
     const deletedBooks = await Book.find({}).deleteMany();
