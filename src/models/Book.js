@@ -25,7 +25,11 @@ const bookSchema = new mongoose.Schema({
         throw new Error("Invalid book");
       }
     }
-  }
+  },
+  ratings: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Rating"
+  }]
 });
 
 const Book = mongoose.model("Book", bookSchema);
