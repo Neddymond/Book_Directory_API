@@ -28,9 +28,34 @@ const bookSchema = new mongoose.Schema({
   },
   ratings: [{
     type: mongoose.Schema.Types.ObjectId,
-    ref: "Rating"
-  }]
+    ref: "Rating",
+  }],
+  average_rating: {
+    type: Number
+  }
 });
+
+bookSchema.pre("save", function(next) {
+  const book = this;
+  // const averageRating;
+
+  // if (book.isModified("ratings")) {
+  //   const sum_of_all_ratings;
+
+  //   for (let i = 0; i <= book.ratings.length; i++) {
+  //     sum_of_all_ratings += book.ratings[i];
+  //   }
+
+  //   // calculate the average rating by dividing the sum of all ratings by the number of ratings
+  //   averageRating = sum_of_all_ratings / book.ratings.length;
+  // }
+
+  // book.averageRating = averageRating.toFixed(1);
+
+  next();
+});
+
+
 
 const Book = mongoose.model("Book", bookSchema);
 module.exports = Book;
