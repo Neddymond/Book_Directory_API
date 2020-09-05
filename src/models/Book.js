@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const validator = require("validator");
+const Rating = require("./Rating");
 
 const bookSchema = new mongoose.Schema({
   name: {
@@ -34,6 +35,26 @@ const bookSchema = new mongoose.Schema({
     type: Number
   }
 });
+
+
+bookSchema.methods.CalcAverageRating = async function (bookId) {
+  const book = this;
+
+  const averageRating = await Rating.aggregate([
+    {
+      $group: {
+        "_id": `${bookId}`,
+        "averageRating": { 
+          "$avg": {
+            "$ifNull": ["$rating", 0]
+          }
+        }
+      }
+    }
+  ]);
+
+  return averageRating[0].averageRating.toFixed(1);
+};
 
 bookSchema.pre("save", function(next) {
   const book = this;
