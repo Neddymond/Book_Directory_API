@@ -77,15 +77,15 @@ router.post("/books/rate/:id", auth, async (req, res) => {
       existingRating["rating"] = req.body.rating;
       await existingRating.save();
 
-      const averageRating = await book.CalcAverageRating();
+      // calculate and update book's average_rating
+      const { avg } = await book.CalcAverageRating();
+      book.average_rating = avg;
 
-      book.average_rating = averageRating.avg;
-
-      // console.log(averageRating);
       await book.save();
 
       res.send(existingRating);
     } else {
+      // new Rating
       const rating = new Rating({
         rating: req.body.rating,
         userId: req.user._id,
@@ -94,12 +94,11 @@ router.post("/books/rate/:id", auth, async (req, res) => {
 
       await rating.save();
       
-      const averageRating = await book.CalcAverageRating();
+      // calculate and assign book's average_rating and total_rating.
+      const { avg, count } = await book.CalcAverageRating();
+      book.total_ratings = count;
+      book.average_rating = avg;
 
-      book.total_ratings = averageRating.count;
-      book.average_rating = averageRating.avg;
-
-      // console.log(averageRating);
       await book.save();
 
       res.send(rating);
