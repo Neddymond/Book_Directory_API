@@ -54,55 +54,58 @@ router.get("/books/all", async (req, res) => {
       res.status(404).send("Directory currently empty");
     }
 
-    let sum_of_all_ratings;
-
-    for (let i = 0; i <= books.ratings.length; i++) {
-      sum_of_all_ratings += books.ratings[i];
-    }
-
-    // calculate the average rating by dividing the sum of all ratings by the number of ratings
-    const averageRating = (sum_of_all_ratings / book.ratings.length).toFixed(1);
-
-    res.send({ books, averageRating });
+    res.send(books);
   } catch (e) {
     res.status(500).end(e);
   }
 });
 
 router.post("/books/rate/:id", auth, async (req, res) => {
- try {
-  const book = await Book.findById(req.params.id);
+  try {
+    const book = await Book.findById(req.params.id);
 
-  // Check if a user rating already exists on a book
-  const existingRating = await Rating.findOne({
-    userId: req.user._id,
-    bookId: book._id
-  });
-
-  // If a rating already exists, update it. Otherwise, create a new rating.
-  if (existingRating) {
-    existingRating["rating"] = req.body.rating;
-    await existingRating.save();
-
-    res.send(existingRating);
-  } else {
-    const rating = new Rating({
-      rating: req.body.rating,
+    // Check if a user rating already exists on a book
+    const existingRating = await Rating.findOne({
       userId: req.user._id,
       bookId: book._id
     });
 
-    await rating.save();
-    // console.log(rating);
-  
-    const bookRating = book.ratings.push(rating._id);
-    await book.save();
+    // If a rating already exists, update it. Otherwise, create a new rating.
+    if (existingRating) {
+      existingRating["rating"] = req.body.rating;
+      await existingRating.save();
 
-    res.send(rating);
+      const averageRating = await book.CalcAverageRating(book._id);
+
+      book.average_rating = averageRating;
+
+      console.log(averageRating);
+      await book.save();
+
+      res.send(existingRating);
+    } else {
+      const rating = new Rating({
+        rating: req.body.rating,
+        userId: req.user._id,
+        bookId: book._id
+      });
+
+      await rating.save();
+      // console.log(rating);
+    
+      const bookRating = book.ratings.push(rating._id);
+      const averageRating = await book.CalcAverageRating(book._id);
+
+      book.average_rating = averageRating;
+
+      console.log(averageRating);
+      await book.save();
+
+      res.send(rating);
+    }
+  } catch (e) {
+    res.status(500).send(e);
   }
- } catch (e) {
-   res.status(500).send(e);
- }
 });
 
 /** Endpoint for updating a Book */
