@@ -29,7 +29,6 @@ router.post("/users", async (req, res) => {
     /** Save user to the database */
     try{
         await user.save();
-        // SendWelcomeEmail(user.email, user.name0);
 
         /** Generate user token on signup */
         const token = await user.GenerateAuthToken();

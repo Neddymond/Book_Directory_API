@@ -27,55 +27,42 @@ const bookSchema = new mongoose.Schema({
       }
     }
   },
-  ratings: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Rating",
-  }],
+  total_ratings: {
+    type: Number
+  },
   average_rating: {
     type: Number
   }
 });
 
 
-bookSchema.methods.CalcAverageRating = async function (bookId) {
+bookSchema.methods.CalcAverageRating = async function () {
   const book = this;
 
   const averageRating = await Rating.aggregate([
+    
     {
       $group: {
-        "_id": `${bookId}`,
+        "_id": "$bookId",
         "averageRating": { 
           "$avg": {
             "$ifNull": ["$rating", 0]
           }
+        },
+        "count": {
+          "$sum": 1
         }
       }
     }
   ]);
 
-  return averageRating[0].averageRating.toFixed(1);
+  console.log(averageRating);
+
+  return {
+    avg: averageRating[0].averageRating.toFixed(1),
+    count: averageRating[0].count
+  };
 };
-
-bookSchema.pre("save", function(next) {
-  const book = this;
-  // const averageRating;
-
-  // if (book.isModified("ratings")) {
-  //   const sum_of_all_ratings;
-
-  //   for (let i = 0; i <= book.ratings.length; i++) {
-  //     sum_of_all_ratings += book.ratings[i];
-  //   }
-
-  //   // calculate the average rating by dividing the sum of all ratings by the number of ratings
-  //   averageRating = sum_of_all_ratings / book.ratings.length;
-  // }
-
-  // book.averageRating = averageRating.toFixed(1);
-
-  next();
-});
-
 
 
 const Book = mongoose.model("Book", bookSchema);

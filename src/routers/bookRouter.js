@@ -62,7 +62,9 @@ router.get("/books/all", async (req, res) => {
 
 router.post("/books/rate/:id", auth, async (req, res) => {
   try {
-    const book = await Book.findById(req.params.id);
+    const book = await Book.findOne({
+      _id: req.params.id
+    });
 
     // Check if a user rating already exists on a book
     const existingRating = await Rating.findOne({
@@ -75,11 +77,11 @@ router.post("/books/rate/:id", auth, async (req, res) => {
       existingRating["rating"] = req.body.rating;
       await existingRating.save();
 
-      const averageRating = await book.CalcAverageRating(book._id);
+      const averageRating = await book.CalcAverageRating();
 
-      book.average_rating = averageRating;
+      book.average_rating = averageRating.avg;
 
-      console.log(averageRating);
+      // console.log(averageRating);
       await book.save();
 
       res.send(existingRating);
@@ -91,14 +93,13 @@ router.post("/books/rate/:id", auth, async (req, res) => {
       });
 
       await rating.save();
-      // console.log(rating);
-    
-      const bookRating = book.ratings.push(rating._id);
-      const averageRating = await book.CalcAverageRating(book._id);
+      
+      const averageRating = await book.CalcAverageRating();
 
-      book.average_rating = averageRating;
+      book.total_ratings = averageRating.count;
+      book.average_rating = averageRating.avg;
 
-      console.log(averageRating);
+      // console.log(averageRating);
       await book.save();
 
       res.send(rating);
