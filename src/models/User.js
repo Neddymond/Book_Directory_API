@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const validator = require("validator");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const Task = require("./Task");
 
 /** User Schema */
 const userSchema = new mongoose.Schema({
@@ -53,11 +52,6 @@ const userSchema = new mongoose.Schema({
     timestamps: true
 });
 
-userSchema.virtual("tasks", {
-    ref: "Task",
-    localField: "_id",
-    foreignField: "owner"
-});
 
 /** Filter out sensitive data */
 userSchema.methods.toJSON = function(){
@@ -85,8 +79,8 @@ userSchema.statics.FindByCredentials = async (email, password) => {
     const user = await User.findOne({email}); 
     if(!user) throw new Error("unable to login");
 
-    const isMatchded = await bcrypt.compare(password, user.password);
-    if(!isMatchded) throw new Error("unable to login");
+    const isMatched = await bcrypt.compare(password, user.password);
+    if(!isMatched) throw new Error("unable to login");
 
     return user;
 };
