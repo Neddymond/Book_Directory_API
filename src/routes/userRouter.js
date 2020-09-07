@@ -5,11 +5,7 @@ const router = new express.Router();
 const User = require("../models/User");
 
 /** Auth Middleware */
-<<<<<<< HEAD
 const auth = require("../Middleware/auth");
-=======
-const auth = require("../Middleware/Auth");
->>>>>>> c6343803d065f97f4aecd516ea503a9a2051d6d8
 
 /**Endpoint for creating a user using a route pointer*/
 router.post("/user", async (req, res) => {
