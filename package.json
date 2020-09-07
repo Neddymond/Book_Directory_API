@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "env-cmd -f ./config/dev.env node src/app.js",
+    "start": "node src/app.js",
     "dev": "env-cmd -f ./config/dev.env nodemon src/app.js",
     "edit": "swagger project edit",
     "test": ""
