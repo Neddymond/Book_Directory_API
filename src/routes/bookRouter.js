@@ -5,7 +5,7 @@ const router = new express.Router();
 const auth = require("../Middleware/auth");
 
 /** Endpoint for adding books */
-router.post("/books/add", auth, async (req, res) => {
+router.post("/book", auth, async (req, res) => {
   try {
     const book = new Book({
       ...req.body
@@ -20,47 +20,7 @@ router.post("/books/add", auth, async (req, res) => {
   }
 });
 
-/** Endpoint for getting all books */
-router.get("/books/all", async (req, res) => {
-  const sort = {};
-
-  /**
-   * if sorting is applied to the query, 
-   * determine whether it is ascending (1) or descending (-1)
-   */
-  if (req.query.sortBy) {
-    const parts = req
-      .query
-      .sortBy
-      .split(":");
-
-    sort[parts[0]] = parts[1] === "desc"
-     ? -1 
-     : 1;
-  }
-
-  try {
-    /**
-     * Fetch all the books in the Book collection,
-     * unless pagination and sorting is applied.
-     */
-    const books = await Book
-      .find({})
-      .limit(parseInt(req.query.limit))
-      .skip(parseInt(req.query.skip))
-      .sort(sort);
-
-    if (books.length <= 0) {
-      res.status(404).send("Directory currently empty");
-    }
-
-    res.send(books);
-  } catch (e) {
-    res.status(500).end(e);
-  }
-});
-
-router.post("/books/rate/:id", auth, async (req, res) => {
+router.post("/book/rate/:id", auth, async (req, res) => {
   try {
     const book = await Book.findOne({
       _id: req.params.id
@@ -108,8 +68,48 @@ router.post("/books/rate/:id", auth, async (req, res) => {
   }
 });
 
+/** Endpoint for getting all books */
+router.get("/books", async (req, res) => {
+  const sort = {};
+
+  /**
+   * if sorting is applied to the query, 
+   * determine whether it is ascending (1) or descending (-1)
+   */
+  if (req.query.sortBy) {
+    const parts = req
+      .query
+      .sortBy
+      .split(":");
+
+    sort[parts[0]] = parts[1] === "desc"
+     ? -1 
+     : 1;
+  }
+
+  try {
+    /**
+     * Fetch all the books in the Book collection,
+     * unless pagination and sorting is applied.
+     */
+    const books = await Book
+      .find({})
+      .limit(parseInt(req.query.limit))
+      .skip(parseInt(req.query.skip))
+      .sort(sort);
+
+    if (books.length <= 0) {
+      res.status(404).send("Directory currently empty");
+    }
+
+    res.send(books);
+  } catch (e) {
+    res.status(500).end(e);
+  }
+});
+
 /** Endpoint for updating a Book */
-router.patch("/books/update/:id", auth, async (req, res) => {
+router.put("/book/:id", auth, async (req, res) => {
   try {
     // All attributes we want to modify
     const reqBody = Object.keys(req.body);
@@ -140,12 +140,12 @@ router.patch("/books/update/:id", auth, async (req, res) => {
 });
 
 /** Endpoint for deleting books */
-router.delete("/books/del", auth, async (req, res) => {
+router.delete("/book/:id", auth, async (req, res) => {
   try {
-    // delete all books
-    const deletedBooks = await Book.find({}).deleteMany();
+    // find and delete a book
+    const deletedBook = await Book.findOneAndDelete({ _id: req.params.id });
 
-    res.send(deletedBooks);
+    res.send(deletedBook);
   } catch (e) {
     res.status(500).send(e);
   }

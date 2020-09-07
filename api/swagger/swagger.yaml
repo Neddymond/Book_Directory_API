@@ -1,0 +1,441 @@
+swagger: 3.0.0
+info:
+  version: 1.0.0
+  title: Book Directory API
+  description: >-
+    An API that allows users to add books, get existing books, and also rate
+    books.
+  contact:
+    name: Chinedu Ikechi
+    email: Neddymond10@gmail.com
+servers: 
+  - url: http://localhost:3000
+  
+paths: 
+  /user:
+    post:
+      summary: Create a user
+      description: Creates a new user in the database
+      tags:
+        - user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Chinedu Ikechi
+                  
+                password:
+                  type: string
+                  example: ??dsklm!!
+                  
+                email:
+                  type: string
+                  example: chinedu@gmail.com
+                  
+                age:
+                  type: integer
+                  example: 27
+
+      responses:
+        201:
+          description: Successfully created a new user
+        400:
+          description: Invalid input
+        500:
+          description: Server error
+          
+  /user/login:
+    post:
+      summary: Login user
+      description: Logs in an existing user
+      tags:
+        - user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                  example: ??dsklm!!
+                  
+                email:
+                  type: string
+                  example: chinedu@gmail.com
+                  
+      responses:
+        200:
+          description: Successful operation
+        400:
+          description: Invalid input
+        404:
+          description: User not found
+        500:
+          description: Server error
+          
+  /user/logout:
+    post:
+      summary: Logs out user current session
+      description: Logs out an existing user. User must be authorized.
+      tags:
+        - user
+      parameters:
+        - name: token
+          in: header
+          description: The current token of an existing user
+          schema:
+            type: string
+
+      responses:
+        200:
+          description: Successful operation
+        401:
+          description: Unauthorized
+        404:
+          description: User not found
+        500:
+          description: Server error
+          
+  /user/logoutAll:
+    post:
+      summary: Logs out all user sessions
+      description: Logs out all sessions of an existing user. User must be authorized.
+      tags:
+        - user
+      parameters:
+        - name: tokens
+          in: header
+          description: All the tokens of an existing user
+          schema:
+            type: array
+            items:
+              properties:
+                _id:
+                  type: string
+                  
+                token:
+                  type: string
+
+      responses:
+        200:
+          description: Successful operation
+        401:
+          description: Unauthorized
+        404:
+          description: User not found
+        500:
+          description: Server error
+          
+  /user/profile:
+    get:
+      summary: Find user
+      description: Retrieve an existing user. User must be authorized.
+      tags:
+        - user
+      parameters: 
+        - name: token
+          in: header
+          description: The current token of an existing user
+          schema:
+            type: string
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                    _id:
+                      type: string
+                      example: "5f538b36e7f0c83fc026dc25"
+                    
+                    name:
+                      type: string
+                      example: Chinedu Ikechi
+                      
+                    email:
+                      type: string
+                      example: chinedu@gmail.com
+                      
+                    age:
+                      type: integer
+                      example: 27
+                      
+                    tokens:
+                      type: array
+                      items:
+                        properties:
+                          _id:
+                            type: string
+                            example: "5f538du80c83fxc026dc14"
+                            
+                          token:
+                            type: string
+                            example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjVmNTJjMjc5MThlNjA0NGZlY2ZlMmM5YyIsImlhdCI6MTU5OTI1OTI1N30.2lvK--aJzkEFbRE5HP0lg0ttVsZhBRbmYVJrIvbiO7o"
+                            
+        401:
+          description: Unuathorized
+        404:
+          description: User not found
+        500:
+          description: Server error
+          
+    put:
+      summary: Update user
+      description: Updates user resource in the database. User must be authorized.
+      tags:
+        - user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Sunday Ikechi
+                  
+                password:
+                  type: string
+                  example: ??dsklm10!!
+                  
+                email:
+                  type: string
+                  example: chinedu10@gmail.com
+                  
+                age:
+                  type: integer
+                  example: 28
+
+      responses:
+        200:
+          description: Successful operation
+        400:
+          description: Invalid input
+        401:
+          description: Unauthorized
+        404:
+          description: User not found
+        500:
+          description: Server error
+          
+    delete:
+      summary: Delete user
+      description: Deletes an existing user from the database. User must be authorized.
+      tags:
+        - user
+      parameters:
+        - name: token
+          in: header
+          description: The current token of an existing user
+          schema:
+            type: string
+
+      responses:
+        200:
+          description: Successful operation
+        401:
+          description: Unauthorized
+        404:
+          description: User not found
+        500:
+          description: Server error
+          
+  /book:
+    post:
+      summary: Add a new book to the directory
+      description: Adds a new book to the directory. User should be authorized.
+      tags:
+        - book
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Deep Work
+                  
+                authors:
+                  type: array
+                  items:
+                    type: string
+                    example: Cal Newport
+                  
+                pages:
+                  type: integer
+                  example: 250
+
+      responses:
+        201:
+          description: Successfully created a new user
+        400:
+          description: Invalid input
+        500:
+          description: Server error
+          
+  /book/rate/{bookId}:
+    post:
+      summary: Rate a book
+      description: Rates a book, or updates a book's rating. User should be authorized.
+      tags:
+        - book
+      parameters:
+        - name: bookId
+          in: path
+          description: The id of the book to be rated
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                rating:
+                  type: integer
+                  minimum: 0
+                  maximum: 5
+                  example: 4
+             
+      responses:
+        200:
+          description: Successfully rated a book
+        400:
+          description: Invalid input
+        401:
+          description: Unauthorized
+        404:
+          description: Book not found
+        500:
+          description: Server error
+          
+  /books:
+    get:
+      summary: Find all books
+      description: Retrieve all books. Authorization not required
+      tags:
+        - book
+      responses:
+        200:
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  properties:
+                      _id:
+                        type: string
+                        example: "5f538b36e7f0c83fc026dc25"
+                      
+                      name:
+                        type: string
+                        example: Deep Work
+                        
+                      authors:
+                        type: array
+                        items:
+                          type: string
+                          example: Cal Newport
+                          
+                      pages:
+                        type: integer
+                        example: 250
+                          
+                      total_ratings:
+                        type: integer
+                        example: 2
+                      
+                      average_rating:
+                        type: integer
+                        example: 4.5
+                        
+        404:
+          description: No book found
+        500:
+          description: Server error
+            
+  /book/{bookId}:
+    put:
+      summary: Update a book
+      description: Updates a book resource in the database. User must be authorized.
+      tags:
+        - book
+      parameters:
+        - name: bookId
+          in: path
+          description: The id of the book to be updated
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  example: Cloud Native with Kubernetes
+                  
+                authors:
+                  type: array
+                  items:
+                    type: string
+                    example:
+                    - "John Arundel"
+                    - "Justin Domingus"
+                  
+                pages:
+                  type: integer
+                  example: 280
+  
+      responses:
+        200:
+          description: Successful operation
+        400:
+          description: Invalid input
+        401:
+          description: Unauthorized
+        404:
+          description: Book not found
+        500:
+          description: Server error
+          
+    delete:
+      summary: Delete a book
+      description: Deletes a book from the database. User must be authorized.
+      tags:
+        - book
+      parameters:
+        - name: bookId
+          in: path
+          description: The id of the book to be deleted
+          required: true
+          schema:
+            type: string
+
+      responses:
+        200:
+          description: Successful operation
+        401:
+          description: Unauthorized
+        404:
+          description: User not found
+        500:
+          description: Server error
