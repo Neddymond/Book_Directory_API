@@ -2,7 +2,7 @@ const express = require("express");
 const router = new express.Router();
 
 /** User Model */
-const User = require("../Models/User");
+const User = require("../models/User");
 
 /** Auth Middleware */
 const auth = require("../Middleware/Auth");
